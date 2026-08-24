@@ -1,10 +1,13 @@
 import { defineConfig, devices } from '@playwright/test';
 import dotenv from 'dotenv';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 
 dotenv.config({ path: path.resolve(process.cwd(), '.env'), quiet: true });
 
 const authFile = path.join(process.cwd(), 'playwright/.auth/user.json');
+const shouldRefreshAuth = process.env.E2E_REFRESH_AUTH === 'true';
+const shouldRunAuthSetup = shouldRefreshAuth || !existsSync(authFile);
 const baseURL = process.env.E2E_BASE_URL || 'http://webtrans-qa-custom-lucas-v2.us-east-2.elasticbeanstalk.com';
 
 /**
@@ -35,10 +38,9 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
-    {
-      name: 'setup',
-      testMatch: /.*\.setup\.js/,
-    },
+    ...(shouldRunAuthSetup
+      ? [{ name: 'setup', testMatch: /.*\.setup\.js/ }]
+      : []),
     {
       name: 'login',
       testMatch: /tests\/login\/.*\.spec\.js/,
@@ -50,7 +52,7 @@ export default defineConfig({
     },
     {
       name: 'chromium',
-      dependencies: ['setup'],
+      dependencies: shouldRunAuthSetup ? ['setup'] : [],
       testIgnore: [/.*\.setup\.js/, /tests\/login\/.*\.spec\.js/],
       use: {
         ...devices['Desktop Chrome'],

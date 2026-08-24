@@ -78,7 +78,7 @@ test('preenchendo email e senha validos', async ({ page }) => {
 
   await page.locator('.organizacao').click()
 
-  await expect(page).toHaveTitle('GW Sistemas - Menu')
+  await expect(page).toHaveTitle('GW Sistemas - Home')
 
   await page.waitForTimeout(5000)
 });

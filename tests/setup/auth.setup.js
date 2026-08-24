@@ -1,11 +1,28 @@
 import { test as setup, expect } from '@playwright/test';
-import { mkdir, rm } from 'node:fs/promises';
+import { access, mkdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 
 const authFile = 'playwright/.auth/user.json';
 
 setup('cria uma sessão autenticada para os testes', async ({ page }) => {
-  const { E2E_LOGIN_EMAIL: email, E2E_LOGIN_PASSWORD: password } = process.env;
+  const {
+    E2E_LOGIN_EMAIL: email,
+    E2E_LOGIN_PASSWORD: password,
+    E2E_ORGANIZATION: organization,
+    E2E_REFRESH_AUTH: refreshAuth,
+  } = process.env;
+
+  const shouldRefreshAuth = refreshAuth === 'true';
+
+  if (!shouldRefreshAuth) {
+    const authFileExists = await access(authFile)
+      .then(() => true)
+      .catch(() => false);
+
+    if (authFileExists) {
+      return;
+    }
+  }
 
   if (!email || !password) {
     throw new Error('Defina E2E_LOGIN_EMAIL e E2E_LOGIN_PASSWORD antes de executar os testes autenticados.');
@@ -24,12 +41,14 @@ setup('cria uma sessão autenticada para os testes', async ({ page }) => {
 
   await page.locator('.button-login').click()
 
-  await expect(page.locator('#lblSelecione')).toHaveText('Selecione a organização desejada');
+  await expect(page.locator('#lblSelecione')).toHaveText('Selecione a organização desejada')
+
   await page.getByPlaceholder('Pesquise outras Organizações').fill(
-    process.env.E2E_ORGANIZATION ?? 'GWSISTEMASQA  J LUCAS',
+    organization ?? 'GWSISTEMASQA  J LUCAS',
   );
   await page.locator('figure.icone-acesso').filter({ hasText: 'Colaborador' }).click();
   await page.locator('.organizacao').click();
+  
   await expect(page).toHaveTitle('GW Sistemas - Home');
 
   await mkdir(path.dirname(authFile), { recursive: true });

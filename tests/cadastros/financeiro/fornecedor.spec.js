@@ -1,19 +1,21 @@
 import { test, expect } from "@playwright/test";
-import { fecharNovidadeVersao } from '../../../support/actions/login.js';
+import { fecharNovidadeVersao } from "../../../support/actions/login.js";
+import { MenuPage } from "../../../support/pages/menu.page.js";
 
 test("consulta fornecedor", async ({ page }) => {
+  const menu = new MenuPage(page)
 
-    await page.goto('/menu')
+  await page.goto("/menu")
 
-    await fecharNovidadeVersao(page)
+  await fecharNovidadeVersao(page)
 
-    await page.getByText("Cadastros").click()
-    await page.getByText("Financeiro").click()
-    await page.getByText("Fornecedores").click()
+  const fornecedorPage = await menu.abrirConsultaFornecedor() // executa essa função que está em menu.page.js
 
+  await fornecedorPage.iniciarNovoCadastro() // executa essa função que está em fornecedor.page.js
 
-      await page.waitForTimeout(5000)
+  await expect(fornecedorPage.tituloCadastro).toBeVisible() //verifica se o titulo da tela está visivel
 
+  await page.waitForTimeout(5000)
 });
 
 test("novo cadastro fornecedor", async ({ page }) => {});
