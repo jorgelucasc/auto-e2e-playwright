@@ -8,7 +8,11 @@ dotenv.config({ path: path.resolve(process.cwd(), '.env'), quiet: true });
 const authFile = path.join(process.cwd(), 'playwright/.auth/user.json');
 const shouldRefreshAuth = process.env.E2E_REFRESH_AUTH === 'true';
 const shouldRunAuthSetup = shouldRefreshAuth || !existsSync(authFile);
-const baseURL = process.env.E2E_BASE_URL || 'http://webtrans-qa-custom-lucas-v2.us-east-2.elasticbeanstalk.com';
+const baseURL = process.env.E2E_BASE_URL;
+
+if (!baseURL) {
+  throw new Error('Defina E2E_BASE_URL antes de executar os testes.');
+}
 
 /**
  * @see https://playwright.dev/docs/test-configuration

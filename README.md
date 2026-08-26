@@ -36,6 +36,7 @@ cp .env.example .env
 | `E2E_ORGANIZATION` | Organização selecionada após o login. |
 
 O arquivo `.env` e a sessão gerada em `playwright/.auth/user.json` não são versionados.
+Nunca versione credenciais, tokens, sessões autenticadas ou URLs internas. O arquivo `.env.example` contém apenas valores ilustrativos.
 
 ## Autenticação reutilizável
 

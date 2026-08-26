@@ -24,8 +24,10 @@ setup('cria uma sessão autenticada para os testes', async ({ page }) => {
     }
   }
 
-  if (!email || !password) {
-    throw new Error('Defina E2E_LOGIN_EMAIL e E2E_LOGIN_PASSWORD antes de executar os testes autenticados.');
+  if (!email || !password || !organization) {
+    throw new Error(
+      'Defina E2E_LOGIN_EMAIL, E2E_LOGIN_PASSWORD e E2E_ORGANIZATION antes de executar os testes autenticados.',
+    );
   }
 
   await rm(authFile, { force: true });
@@ -43,9 +45,7 @@ setup('cria uma sessão autenticada para os testes', async ({ page }) => {
 
   await expect(page.locator('#lblSelecione')).toHaveText('Selecione a organização desejada')
 
-  await page.getByPlaceholder('Pesquise outras Organizações').fill(
-    process.env.E2E_ORGANIZATION ?? 'GWSISTEMASQA  J LUCAS',
-  );
+  await page.getByPlaceholder('Pesquise outras Organizações').fill(organization);
 
   await page.locator('figure.icone-acesso').filter({ hasText: 'Colaborador' }).click();
   await page.locator('.organizacao').click();
