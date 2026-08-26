@@ -1,8 +1,8 @@
-import { FornecedorPage } from './fornecedor.page.js';
+import { ConsultaFornecedorPage } from './telasconsulta/consulta-fornecedor.page.js';
 
 export class MenuPage {
   constructor(page) {
-    this.page = page;
+    this.page = page
   }
 
   async abrirConsultaFornecedor() {
@@ -18,6 +18,6 @@ export class MenuPage {
 
     await novaJanela.waitForLoadState();
 
-    return new FornecedorPage(novaJanela);
+    return new ConsultaFornecedorPage(novaJanela);
   }
 }

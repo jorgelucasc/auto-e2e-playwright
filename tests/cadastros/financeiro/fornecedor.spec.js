@@ -3,17 +3,26 @@ import { fecharNovidadeVersao } from "../../../support/actions/login.js";
 import { MenuPage } from "../../../support/pages/menu.page.js";
 
 test("consulta fornecedor", async ({ page }) => {
-  const menu = new MenuPage(page)
 
-  await page.goto("/menu")
+  await page.goto('/menu')
 
-  await fecharNovidadeVersao(page)
+  await fecharNovidadeVersao(page)//fecha o novidades se aparecer
 
-  const fornecedorPage = await menu.abrirConsultaFornecedor() // executa essa função que está em menu.page.js
+  const menuPage = new MenuPage(page)
 
-  await fornecedorPage.iniciarNovoCadastro() // executa essa função que está em fornecedor.page.js
+  const consultaFornecedorPage = await menuPage.abrirConsultaFornecedor()
 
-  await expect(fornecedorPage.tituloCadastro).toBeVisible() //verifica se o titulo da tela está visivel
+  await expect(consultaFornecedorPage.page).toHaveURL(
+    /codTela=14$/,
+  );
+
+  await expect(consultaFornecedorPage.tituloPagina).toBeVisible()
+
+  await consultaFornecedorPage.selecionarFiltro('Contato')
+
+  await consultaFornecedorPage.preencherInputFiltro('teste')
+
+  await consultaFornecedorPage.pesquisar()
 
   await page.waitForTimeout(5000)
 });
