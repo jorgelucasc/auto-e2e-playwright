@@ -44,8 +44,9 @@ setup('cria uma sessão autenticada para os testes', async ({ page }) => {
   await expect(page.locator('#lblSelecione')).toHaveText('Selecione a organização desejada')
 
   await page.getByPlaceholder('Pesquise outras Organizações').fill(
-    organization ?? 'GWSISTEMASQA  J LUCAS',
+    process.env.E2E_ORGANIZATION ?? 'GWSISTEMASQA  J LUCAS',
   );
+
   await page.locator('figure.icone-acesso').filter({ hasText: 'Colaborador' }).click();
   await page.locator('.organizacao').click();
   
