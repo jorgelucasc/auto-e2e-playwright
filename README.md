@@ -1,10 +1,10 @@
-# Front Webtrans — Testes End-to-End
+# Front — Testes End-to-End
 
 Projeto de automação end-to-end do Webtrans, desenvolvido com [Playwright](https://playwright.dev/) e JavaScript.
 
 ## Objetivo
 
-Este projeto iniciou a automação end-to-end do sistema Webtrans com Playwright.
+Este projeto iniciou a automação end-to-end do sistema com Playwright.
 
 Além de cobrir fluxos críticos, a iniciativa busca melhorar o processo de validação, reduzindo atividades manuais, aumentando a confiabilidade das entregas e criando uma base reutilizável para novos cenários automatizados.
 
@@ -30,7 +30,7 @@ cp .env.example .env
 
 | Variável | Descrição |
 | --- | --- |
-| `E2E_BASE_URL` | URL base do ambiente Webtrans. |
+| `E2E_BASE_URL` | URL base do ambiente. |
 | `E2E_LOGIN_EMAIL` | E-mail do usuário de teste. |
 | `E2E_LOGIN_PASSWORD` | Senha do usuário de teste. |
 | `E2E_ORGANIZATION` | Organização selecionada após o login. |
@@ -89,3 +89,17 @@ support/
 ```
 
 Os testes devem manter o foco no cenário e nas validações. Interações repetidas e locators ficam em actions ou Page Objects para reduzir duplicação e facilitar manutenção.
+
+## CI/CD
+
+O projeto utiliza GitHub Actions para executar os testes automaticamente em pushes e Pull Requests direcionados à branch `main`.
+
+O workflow:
+
+- instala as dependências e os navegadores do Playwright;
+- realiza a autenticação usando GitHub Secrets;
+- executa os testes em Chrome e Firefox;
+- publica o relatório HTML como artefato da execução.
+
+As credenciais e configurações do ambiente são armazenadas com segurança no GitHub Actions usando:
+`E2E_BASE_URL`, `E2E_LOGIN_EMAIL`, `E2E_LOGIN_PASSWORD` e `E2E_ORGANIZATION`.

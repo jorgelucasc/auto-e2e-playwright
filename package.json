@@ -1,5 +1,5 @@
 {
-  "name": "front-webtrans",
+  "name": "auto-e2e-playwright",
   "version": "1.0.0",
   "type": "module",
   "main": "index.js",
