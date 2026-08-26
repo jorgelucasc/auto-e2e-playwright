@@ -60,15 +60,20 @@ export default defineConfig({
       },
     },
 
-    /*{
+    {
       name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      dependencies: shouldRunAuthSetup ? ['setup'] : [],
+      testIgnore: [/.*\.setup\.js/, /tests\/login\/.*\.spec\.js/],
+      use: {
+        ...devices['Desktop Firefox'],
+        storageState: authFile,
+      },
     },
 
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
-    },*/
+    },
 
     /* Test against mobile viewports. */
     // {
