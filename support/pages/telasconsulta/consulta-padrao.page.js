@@ -44,7 +44,7 @@ export class ConsultaPadraoPage {
   }
 
   get botaoPesquisar() {
-    return this.page.locator('input[type:"button"][value="Pesquisar"]') //buscar por qualquer botao com o value Pesquisar
+    return this.page.getByRole('button', { name: 'Pesquisar', exact: true }) //buscar por qualquer botao com o value Pesquisar
   }
 
   async pesquisar() {
