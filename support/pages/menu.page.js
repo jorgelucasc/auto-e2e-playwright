@@ -20,4 +20,10 @@ export class MenuPage {
 
     return new ConsultaFornecedorPage(novaJanela);
   }
+
+  async abrirConsultaConhecimento() {
+
+    await this.page.locator('.li-menu-principal', { hasText: 'Cadastros' }).hover(); //passa mouse sobre o menu
+
+  }
 }

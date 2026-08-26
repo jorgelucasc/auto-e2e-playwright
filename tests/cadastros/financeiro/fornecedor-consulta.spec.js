@@ -2,7 +2,8 @@ import { test, expect } from "@playwright/test";
 import { fecharNovidadeVersao } from "../../../support/actions/login.js";
 import { MenuPage } from "../../../support/pages/menu.page.js";
 
-test("consulta fornecedor", async ({ page }) => {
+test.describe("Consulta de Fornecedor", () => {
+  test("consulta fornecedor", async ({ page }) => {
 
   await page.goto('/menu')
 
@@ -25,8 +26,9 @@ test("consulta fornecedor", async ({ page }) => {
   await consultaFornecedorPage.pesquisar()
 
   await page.waitForTimeout(5000)
-});
+  })
+  
+  test("deve consultar por data", async ({ page }) => {
 
-test("novo cadastro fornecedor", async ({ page }) => {});
-
-test("cadastro fornecedor duplicado", async ({ page }) => {});
+  })
+})
