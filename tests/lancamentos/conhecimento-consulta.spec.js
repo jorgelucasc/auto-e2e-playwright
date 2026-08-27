@@ -1,5 +1,5 @@
-import {test, expect} from "@playwright/test"
+import { test, expect } from "@playwright/test";
 
-test("filtrar por data", async ({ page }) => {
-    
-})
+test("filtrar conhecimento por data", async ({ page }) => {
+  await page.goto("/consultaconhecimento?acao=iniciar");
+});

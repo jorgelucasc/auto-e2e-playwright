@@ -1,34 +1,27 @@
 import { test, expect } from "@playwright/test";
 import { fecharNovidadeVersao } from "../../../support/actions/login.js";
-import { MenuPage } from "../../../support/pages/menu.page.js";
+import { ConsultaFornecedorPage } from "../../../support/pages/telasconsulta/consulta-fornecedor.page.js";
 
 test.describe("Consulta de Fornecedor", () => {
   test("consulta fornecedor", async ({ page }) => {
+    await page.goto("/ConsultaControlador?codTela=14");
 
-  await page.goto('/menu')
+    await fecharNovidadeVersao(page); //fecha o novidades se aparecer
 
-  await fecharNovidadeVersao(page)//fecha o novidades se aparecer
+    const consultaFornecedorPage = new ConsultaFornecedorPage(page);
 
-  const menuPage = new MenuPage(page)
+    await expect(consultaFornecedorPage.page).toHaveURL(/codTela=14$/);
 
-  const consultaFornecedorPage = await menuPage.abrirConsultaFornecedor()
+    await expect(consultaFornecedorPage.tituloPagina).toBeVisible();
 
-  await expect(consultaFornecedorPage.page).toHaveURL(
-    /codTela=14$/,
-  );
+    await consultaFornecedorPage.selecionarFiltro("Contato");
 
-  await expect(consultaFornecedorPage.tituloPagina).toBeVisible()
+    await consultaFornecedorPage.preencherInputFiltro("teste");
 
-  await consultaFornecedorPage.selecionarFiltro('Contato')
+    await consultaFornecedorPage.pesquisar()
 
-  await consultaFornecedorPage.preencherInputFiltro('teste')
+    await page.waitForTimeout(5000);
+  });
 
-  await consultaFornecedorPage.pesquisar()
-
-  await page.waitForTimeout(5000)
-  })
-  
-  test("deve consultar por data", async ({ page }) => {
-
-  })
-})
+  test("deve consultar por data", async ({ page }) => {});
+});
