@@ -20,3 +20,13 @@ Como o responsável pelo projeto está aprendendo programação, ao realizar alt
 - Informe como utilizar a nova implementação e quais comportamentos esperar.
 - Ao corrigir um erro, explique a causa, o impacto e como a correção resolve o problema.
 - Mantenha o código profissional e não substitua a explicação por comentários excessivos dentro dos arquivos.
+
+## Organização dos testes e Page Objects
+
+- Use Page Objects específicos para representar telas e fluxos de interação de uma rotina, como `ConhecimentoPage`, `ColetaPage` ou `DespesaPage`.
+- Não crie um Page Object para documentos apenas porque eles são impressos. DACTE, coleta e despesa são resultados gerados pelas telas de suas respectivas rotinas.
+- Extraia comportamentos visuais compartilhados entre telas para Page Objects ou componentes reutilizáveis, como `ConsultaPadraoPage` para o botão e o fluxo de pesquisa.
+- Mantenha no Page Object específico apenas os campos, seletores e comportamentos exclusivos daquela tela.
+- Use actions para combinar etapas de negócio reutilizadas, como pesquisar um registro e imprimir vários modelos de relatório.
+- Use fixtures para criar e disponibilizar Page Objects com o ciclo de vida correto para cada teste. Fixtures não devem concentrar seletores nem substituir Page Objects ou actions.
+- Mantenha `RelatorioPadraoPage` responsável pelos comportamentos comuns de impressão, independentemente da rotina que iniciou o relatório.
