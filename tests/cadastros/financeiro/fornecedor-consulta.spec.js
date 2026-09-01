@@ -20,7 +20,7 @@ test.describe("Consulta de Fornecedor", () => {
 
     await consultaFornecedorPage.pesquisar()
 
-    await page.waitForTimeout(5000);
+    await page.waitForTimeout(5000)
   });
 
   test("deve consultar por data", async ({ page }) => {});

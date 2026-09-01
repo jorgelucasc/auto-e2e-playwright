@@ -19,17 +19,41 @@ test("imprimir 1 minuta por vez", async ({ page, relatorioPadraoPage }) => {
     ["1"],
   );
 
-  await expect(paginaImpressao).toHaveURL(/jspconsulta_conhecimento/);
-  await expect(paginaImpressao.locator("iframe")).toBeVisible();
+  await expect(paginaImpressao).toHaveURL(/jspconsulta_conhecimento/)
+  await expect(paginaImpressao.locator("iframe")).toBeVisible()
 });
 
-test("imprimir 1 dacte de CTe não averbado", async ({ page, relatorioPadraoPage }) => {
-  const conhecimentoPage = new ConhecimentoPage(page);
-  const consultaPadraoPage = new ConsultaPadraoPage(page);
+test("alert ao imprimir dacte não averbado", async ({ page }) => {
+  const conhecimentoPage = new ConhecimentoPage(page)
+  const consultaPadraoPage = new ConsultaPadraoPage(page)
 
-  await page.goto("/CTeControlador?acao=listar&&tipoTransporte=r");
+  await page.goto("/CTeControlador?acao=listar&&tipoTransporte=r")
 
-  await conhecimentoPage.selecionarFiltroConsulta("s.numero");
-  await conhecimentoPage.preencherInputFiltro("valor_consulta", "041131");
-  await consultaPadraoPage.pesquisar();
-});
+  await conhecimentoPage.selecionarFiltroConsulta("s.numero")
+  await conhecimentoPage.preencherInputFiltro("valor_consulta", "041156")
+  await page.locator("#filial").selectOption("1")
+  await page.locator("#statusCte").selectOption("C")
+  await page.locator("#documentoAverbacao").selectOption("n")
+  await consultaPadraoPage.pesquisar()
+
+  const linhaResultado = page.locator("tr").filter({ hasText: "041156" }).first()
+  await expect(linhaResultado).toBeVisible()
+
+  await expect(page.locator('#statusCte')).toHaveValue('C')
+
+
+  const checkboxCte = linhaResultado.locator('input[type="checkbox"]')
+  await expect(checkboxCte).toBeVisible()
+  await checkboxCte.check()
+
+  const botaoImprimirDacte = page.locator("#img_imprimir")
+  await expect(botaoImprimirDacte).toBeVisible()
+
+  const dialogPromise = page.waitForEvent("dialog")
+  await botaoImprimirDacte.click()
+
+  const dialog = await dialogPromise
+  expect(dialog.type()).toBe("alert")
+  expect(dialog.message()).toContain("não está(o) averbado(s)")
+  await dialog.accept()
+})

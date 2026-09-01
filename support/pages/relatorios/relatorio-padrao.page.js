@@ -21,9 +21,9 @@ export class RelatorioPadraoPage {
       this.botaoImpressaoPdf.click(),
     ]);
 
-    await paginaImpressao.waitForLoadState('load');
+    await paginaImpressao.waitForLoadState('load')
     await paginaImpressao.locator('iframe').waitFor({ state: 'visible' })
 
-    return paginaImpressao;
+    return paginaImpressao
   }
 }

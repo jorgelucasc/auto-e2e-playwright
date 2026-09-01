@@ -55,11 +55,12 @@ export default defineConfig({
       },
     },
     {
-      name: 'chromium',
+      name: 'Chrome',
       dependencies: shouldRunAuthSetup ? ['setup'] : [],
       testIgnore: [/.*\.setup\.js/, /tests\/login\/.*\.spec\.js/],
       use: {
         ...devices['Desktop Chrome'],
+        channel: 'chrome',
         storageState: authFile,
       },
     },
