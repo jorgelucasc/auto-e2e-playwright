@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json.schemastore.org/kiro-agent.json",
+  "name": "front-webtrans",
+  "description": "Agente para o projeto de automacao E2E do Webtrans (Playwright + JavaScript)",
+  "tools": [
+    "read",
+    "write",
+    "shell",
+    "grep",
+    "glob",
+    "code"
+  ],
+  "allowedTools": [
+    "read",
+    "grep",
+    "glob",
+    "code"
+  ],
+  "resources": [
+    "file://AGENTS.md",
+    "file://README.md",
+    "file://playwright.config.js",
+    "file://.kiro/steering/**/*.md",
+    "file://tests/**/*.js",
+    "file://support/**/*.js"
+  ]
+}
