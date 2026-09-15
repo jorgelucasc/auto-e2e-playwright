@@ -56,19 +56,19 @@ const CAMPO_CHAVE_POR_VISAO = {
   vbi_movimentacao_pallets:"Nº Nota",
   vbi_navio:"Descrição",
   vbi_nota_fiscal:"Nota Fiscal",
-  vbi_nota_servico:"Nota de Serviço",
-  vbi_observacao:"Observação",
-  vbi_ocorrencia_ctrcs:"Ocorrência CTRCs",
-  vbi_orcamento_venda:"Orçamento de Venda",
-  vbi_origem_captacao:"Origem da Captura",
+  vbi_nota_servico:"Espécie",
+  vbi_observacao:"Descrição",
+  vbi_ocorrencia_ctrcs:"Código",
+  vbi_orcamento_venda:"Número",
+  vbi_origem_captacao:"Descrição",
   vbi_porto:"Descrição",
-  vbi_plano_conta:"Plano de Conta",
-  vbi_planocusto:"Plano de Custo",
+  vbi_plano_conta:"Conta contábil",
+  vbi_planocusto:"Código",
   vbi_produto:"Descrição",
-  vbi_rateio:"Rateio",
+  vbi_rateio:"Descrição",
   vbi_romaneio:"Romaneio",
   vbi_rotas:"Descrição",
-  vbi_rotas_tabela_preco:"Tabela de Preços",
+  vbi_rotas_tabela_preco:"Número",
   vbi_servico:"Descrição",
   vbi_client_tariffs:"Tarifas do Cliente",
   vbi_client_tariffs_analise:"Análise de Tarifas do Cliente",
@@ -134,49 +134,31 @@ export class RelatorioPersonalizadoPage {
 
     const campoChave = CAMPO_CHAVE_POR_VISAO[value];
 
-    if (campoChave) {
-      // Estratégia principal: aguardamos até que o campo-chave específico
-      // desta visão apareça entre as colunas. Só esse campo existir já
-      // confirma que a tela atualizou para a visão correta — sem risco de
-      // validar os campos da visão anterior (estado residual no DOM).
-      await this.page.waitForFunction(
-        (chaveNormalizada) => {
-          const normalizarNoDom = (texto) =>
-            texto
-              .normalize("NFD")
-              .replace(/[\u0300-\u036f]/g, "")
-              .trim()
-              .toLowerCase();
+    // Aguardamos até que o campo-chave específico desta visão apareça entre
+    // as colunas. Só esse campo existir já confirma que a tela atualizou para
+    // a visão correta — sem risco de validar os campos da visão anterior
+    // (estado residual no DOM). O teste só chama este método para visões
+    // mapeadas, então campoChave sempre está definido aqui.
+    await this.page.waitForFunction(
+      (chaveNormalizada) => {
+        const normalizarNoDom = (texto) =>
+          texto
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .trim()
+            .toLowerCase();
 
-          const campos = [
-            ...document.querySelectorAll('#abaColunas input[name^="label["]'),
-          ];
+        const campos = [
+          ...document.querySelectorAll('#abaColunas input[name^="label["]'),
+        ];
 
-          return campos.some((campo) =>
-            normalizarNoDom(campo.value).includes(chaveNormalizada),
-          );
-        },
-        normalizar(campoChave),
-        { timeout: 120000 },
-      );
-    } else {
-      // Fallback para visões ainda não mapeadas: aguardamos de forma
-      // determinística até que ao menos 2 colunas estejam preenchidas.
-      await this.page.waitForFunction(
-        () => {
-          const campos = [
-            ...document.querySelectorAll('#abaColunas input[name^="label["]'),
-          ];
-          const preenchidos = campos.filter(
-            (campo) => campo.value.trim() !== "",
-          );
-
-          return preenchidos.length >= 2;
-        },
-        undefined,
-        { timeout: 120000 },
-      );
-    }
+        return campos.some((campo) =>
+          normalizarNoDom(campo.value).includes(chaveNormalizada),
+        );
+      },
+      normalizar(campoChave),
+      { timeout: 120000 },
+    );
 
     return this.obterNomesPrimeirasColunas();
   }

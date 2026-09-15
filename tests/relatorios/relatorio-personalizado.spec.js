@@ -14,53 +14,46 @@ test("carregar todas as visões do relatório personalizado", async ({
 
   for (const visao of visoes) {
     await test.step(`carregar campos da visão ${visao.text}`, async () => {
-      const nomesColunas = await relatorioPage.selecionarVisao(visao.value);
       const campoChave = relatorioPage.obterCampoChave(visao.value);
 
-      if (campoChave) {
-        // Visão mapeada: confirmamos que o campo-chave específico dela
-        // apareceu entre as colunas — prova de que a tela atualizou para
-        // a visão correta e não estamos validando a visão anterior.
-        const todasColunas = await relatorioPage.obterTodosNomesColunas();
-        const normalizar = (texto) =>
-          texto
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .trim()
-            .toLowerCase();
-
-        const encontrouCampoChave = todasColunas.some((coluna) =>
-          normalizar(coluna).includes(normalizar(campoChave)),
-        );
-
+      // Só validamos visões mapeadas. Uma visão sem campo-chave indica que
+      // falta adicioná-la em CAMPO_CHAVE_POR_VISAO — o teste falha para
+      // sinalizar isso, em vez de mascarar com uma validação genérica.
+      if (!campoChave) {
         expect
           .soft(
-            encontrouCampoChave,
-            `visão ${visao.text} deve conter o campo-chave "${campoChave}"`,
+            campoChave,
+            `visão ${visao.text} (${visao.value}) não está mapeada — ` +
+              `adicione o campo-chave em CAMPO_CHAVE_POR_VISAO na page ` +
+              `relatorio-personalizado.page.js`,
           )
-          .toBe(true);
-      } else {
-        // Visão ainda não mapeada: validamos que ao menos 2 colunas
-        // apareceram e não estão vazias.
-        expect
-          .soft(
-            nomesColunas.length,
-            `visão ${visao.text} deve ter ao menos 2 colunas`,
-          )
-          .toBeGreaterThanOrEqual(2);
-        expect
-          .soft(
-            nomesColunas[0],
-            `1ª coluna da visão ${visao.text} não pode ser vazia`,
-          )
-          .not.toBe("");
-        expect
-          .soft(
-            nomesColunas[1],
-            `2ª coluna da visão ${visao.text} não pode ser vazia`,
-          )
-          .not.toBe("");
+          .toBeDefined();
+        return;
       }
+
+      await relatorioPage.selecionarVisao(visao.value);
+
+      // Visão mapeada: confirmamos que o campo-chave específico dela
+      // apareceu entre as colunas — prova de que a tela atualizou para
+      // a visão correta e não estamos validando a visão anterior.
+      const todasColunas = await relatorioPage.obterTodosNomesColunas();
+      const normalizar = (texto) =>
+        texto
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .trim()
+          .toLowerCase();
+
+      const encontrouCampoChave = todasColunas.some((coluna) =>
+        normalizar(coluna).includes(normalizar(campoChave)),
+      );
+
+      expect
+        .soft(
+          encontrouCampoChave,
+          `visão ${visao.text} deve conter o campo-chave "${campoChave}"`,
+        )
+        .toBe(true);
     });
   }
 });
