@@ -1,6 +1,5 @@
 import { expect } from "@playwright/test";
 import { test } from "../../../support/fixtures/pages.fixture.js";
-import { imprimirModelosRelatorio } from "../../../support/actions/impressao-relatorios.js";
 import { ConhecimentoPage } from "../../../support/pages/lancamentos/conhecimento/conhecimento.page.js";
 import { ConsultaPadraoPage } from "../../../support/pages/telasconsulta/consulta-padrao.page.js";
 
@@ -46,23 +45,65 @@ async function imprimirModeloDacte(page, linhaResultado, modelo) {
   await expect(page.locator("#modelo")).toBeEnabled({ timeout: 120000 });
 }
 
-test("imprimir 1 minuta por vez", async ({ page, relatorioPadraoPage }) => {
+test("imprimir todos os modelos de minuta", async ({ page }) => {
   const conhecimentoPage = new ConhecimentoPage(page);
   const consultaPadraoPage = new ConsultaPadraoPage(page);
+  const numeroCte = "041155";
+  const modelosMinuta = ["1", "2", "3", "4", "5"];
 
-  await conhecimentoPage.acessar();
+  // Ao reimprimir um CT-e já impresso, a tela abre um confirm
+  // ("já foi impresso, deseja imprimir novamente?"). Aceitamos sempre para
+  // que a impressão prossiga.
+  page.on("dialog", (dialog) => dialog.accept());
 
-  await conhecimentoPage.selecionarFiltroConsulta("nfiscal");
-  await conhecimentoPage.preencherInputFiltro("valor_consulta", "041130");
-  await consultaPadraoPage.pesquisar();
+  async function pesquisarESelecionarCte() {
+    await conhecimentoPage.acessar();
+    await conhecimentoPage.selecionarFiltroConsulta("nfiscal");
+    await conhecimentoPage.preencherInputFiltro("valor_consulta", numeroCte);
+    await consultaPadraoPage.pesquisar();
 
-  const [paginaImpressao] = await imprimirModelosRelatorio(
-    relatorioPadraoPage,
-    ["1"],
-  );
+    const linhaResultado = page
+      .locator("tr")
+      .filter({ hasText: numeroCte })
+      .first();
+    await expect(linhaResultado).toBeVisible({ timeout: 120000 });
 
-  await expect(paginaImpressao).toHaveURL(/jspconsulta_conhecimento/);
-  await expect(paginaImpressao.locator("iframe")).toBeVisible();
+    // Seleciona ao menos 1 CT-e (checkbox da linha: ck0, ck1, ...)
+    const checkboxCte = linhaResultado
+      .locator('input[type="checkbox"][id^="ck"]')
+      .first();
+    await expect(checkboxCte).toBeVisible({ timeout: 120000 });
+    await checkboxCte.check();
+  }
+
+  await pesquisarESelecionarCte();
+
+  // O relatório de cada modelo abre em uma nova janela. Após validar,
+  // fechamos a janela, retornamos à listagem e imprimimos o próximo modelo.
+  for (const modelo of modelosMinuta) {
+    await test.step(`imprimir modelo de minuta ${modelo}`, async () => {
+      const botaoImprimir = page.getByTitle("Imprimir CT-e(s) selecionados");
+      await expect(botaoImprimir).toBeVisible({ timeout: 120000 });
+      await expect(page.locator("#modelo")).toBeEnabled({ timeout: 120000 });
+      await page.locator("#modelo").selectOption({ value: modelo });
+
+      const [paginaRelatorio] = await Promise.all([
+        page.waitForEvent("popup", { timeout: 120000 }),
+        botaoImprimir.click(),
+      ]);
+
+      await paginaRelatorio.waitForLoadState("load", { timeout: 120000 });
+      await expect(paginaRelatorio).toHaveURL(/matricidectrc\.ctrc/, {
+        timeout: 120000,
+      });
+
+      await paginaRelatorio.close();
+
+      // A janela de relatório abriu a partir da listagem; garantimos que a
+      // seleção do CT-e continua válida para o próximo modelo.
+      await pesquisarESelecionarCte();
+    });
+  }
 });
 
 test("alert ao imprimir dacte não averbado", async ({ page }) => {
